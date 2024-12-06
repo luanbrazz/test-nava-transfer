@@ -1,5 +1,6 @@
 package com.test.luanbraz.navatransfer.configuration;
 
+import com.test.luanbraz.navatransfer.filter.JwtRequestFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,11 +12,19 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class WebSecurityConfiguration {
+
+    private final JwtRequestFilter jwtRequestFilter;
+
+    public WebSecurityConfiguration(JwtRequestFilter jwtRequestFilter) {
+        this.jwtRequestFilter = jwtRequestFilter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -24,6 +33,7 @@ public class WebSecurityConfiguration {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/signup").permitAll()
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
@@ -31,7 +41,9 @@ public class WebSecurityConfiguration {
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+                )
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
