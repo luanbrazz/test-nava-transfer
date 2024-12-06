@@ -2,6 +2,7 @@ package com.test.luanbraz.navatransfer.controllers.auth;
 
 import com.test.luanbraz.navatransfer.dto.SignupRequest;
 import com.test.luanbraz.navatransfer.dto.errors.CustomErrorResponse;
+import com.test.luanbraz.navatransfer.entities.Customer;
 import com.test.luanbraz.navatransfer.services.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/signup")
@@ -28,7 +30,14 @@ public class SignupController {
             boolean isUserCreated = authService.createCustomer(request);
 
             if (isUserCreated) {
-                return ResponseEntity.status(HttpStatus.CREATED).body("Customer registered successfully!");
+                
+                Customer createdCustomer = authService.getCustomerByEmail(request.getEmail());
+
+                return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                        "id", createdCustomer.getId(),
+                        "name", createdCustomer.getName(),
+                        "email", createdCustomer.getEmail()
+                ));
             } else {
                 CustomErrorResponse errorResponse = new CustomErrorResponse(
                         LocalDateTime.now(),
@@ -46,4 +55,6 @@ public class SignupController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+
+
 }

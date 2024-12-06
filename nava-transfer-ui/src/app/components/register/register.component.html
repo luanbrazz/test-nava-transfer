@@ -1,0 +1,61 @@
+<div class="container">
+  <h2>Registre-se</h2>
+  <form [formGroup]="registerForm" (ngSubmit)="submitForm()">
+    <div class="form-group">
+      <label for="name">Nome</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        formControlName="name"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        formControlName="email"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="password">Senha</label>
+      <input
+        type="password"
+        class="form-control"
+        id="password"
+        formControlName="password"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirma senha</label>
+      <input
+        type="password"
+        class="form-control"
+        id="confirmPassword"
+        formControlName="confirmPassword"
+      />
+      <div
+        class="text-danger"
+        *ngIf="
+          registerForm.get('confirmPassword')?.errors?.['passwordMismatch'] &&
+          registerForm.get('confirmPassword')?.touched
+        "
+      >
+        As senhas não coincidem.
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="registerForm.invalid"
+    >
+      Registrar
+    </button>
+  </form>
+</div>
