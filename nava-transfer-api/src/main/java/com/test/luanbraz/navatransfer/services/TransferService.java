@@ -9,4 +9,6 @@ public interface TransferService {
     TransferResponse createTransfer(TransferRequest request);
 
     List<TransferResponse> getAllTransfers();
+
+    TransferResponse getTransferById(Long id);
 }

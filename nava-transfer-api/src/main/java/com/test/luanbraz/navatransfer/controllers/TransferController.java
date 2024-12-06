@@ -32,4 +32,9 @@ public class TransferController {
     public ResponseEntity<List<TransferResponse>> getAllTransfers() {
         return ResponseEntity.ok(transferService.getAllTransfers());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TransferResponse> getTransferById(@PathVariable Long id) {
+        return ResponseEntity.ok(transferService.getTransferById(id));
+    }
 }

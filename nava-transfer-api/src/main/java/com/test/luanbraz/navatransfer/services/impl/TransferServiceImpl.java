@@ -8,6 +8,7 @@ import com.test.luanbraz.navatransfer.entities.enuns.TransferStatus;
 import com.test.luanbraz.navatransfer.exceptions.CustomException;
 import com.test.luanbraz.navatransfer.repositories.TransferRepository;
 import com.test.luanbraz.navatransfer.services.TransferService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -34,7 +35,10 @@ public class TransferServiceImpl implements TransferService {
         BigDecimal fee = calculateFee(request.getAmount(), daysDifference);
 
         if (fee == null) {
-            throw new CustomException(createErrorResponse("Erro na transferência", "Nenhuma taxa aplicável para a data de transferência determinada."));
+            throw new CustomException(
+                    createErrorResponse("Erro de negócio", "Nenhuma taxa aplicável para a data de transferência determinada."),
+                    HttpStatus.UNPROCESSABLE_ENTITY
+            );
         }
 
         Transfer transfer = buildTransfer(request, today, fee);
@@ -50,6 +54,12 @@ public class TransferServiceImpl implements TransferService {
         return transferRepository.findAll().stream()
                 .map(this::toTransferResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public TransferResponse getTransferById(Long id) {
+        Transfer transfer = findTransferByIdOrThrow(id, "Erro na recuperação da transferência", "Transferência não encontrada.");
+        return toTransferResponse(transfer);
     }
 
     private BigDecimal calculateFee(BigDecimal amount, long daysDifference) {
@@ -93,4 +103,13 @@ public class TransferServiceImpl implements TransferService {
                 transfer.getStatus()
         );
     }
+
+    private Transfer findTransferByIdOrThrow(Long id, String errorTitle, String errorMessage) {
+        return transferRepository.findById(id)
+                .orElseThrow(() -> new CustomException(
+                        createErrorResponse(errorTitle, errorMessage),
+                        HttpStatus.NOT_FOUND
+                ));
+    }
+
 }
