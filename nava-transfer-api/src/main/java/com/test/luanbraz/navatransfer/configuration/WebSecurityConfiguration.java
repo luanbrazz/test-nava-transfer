@@ -19,8 +19,12 @@ public class WebSecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/signup").permitAll()
                         .anyRequest().authenticated()
+                )
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions.disable())
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
