@@ -37,4 +37,9 @@ public class TransferController {
     public ResponseEntity<TransferResponse> getTransferById(@PathVariable Long id) {
         return ResponseEntity.ok(transferService.getTransferById(id));
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<TransferResponse> cancelTransfer(@PathVariable Long id) {
+        return ResponseEntity.ok(transferService.cancelTransferById(id));
+    }
 }

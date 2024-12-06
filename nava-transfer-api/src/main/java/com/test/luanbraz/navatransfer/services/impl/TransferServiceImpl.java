@@ -53,13 +53,29 @@ public class TransferServiceImpl implements TransferService {
     public List<TransferResponse> getAllTransfers() {
         return transferRepository.findAll().stream()
                 .map(this::toTransferResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public TransferResponse getTransferById(Long id) {
         Transfer transfer = findTransferByIdOrThrow(id, "Erro na recuperação da transferência", "Transferência não encontrada.");
         return toTransferResponse(transfer);
+    }
+
+    @Override
+    public TransferResponse cancelTransferById(Long id) {
+        Transfer transfer = findTransferByIdOrThrow(id, "Erro de cancelamento de transferência", "Transferência não encontrada.");
+
+        if (!transfer.getTransferDate().isAfter(LocalDate.now())) {
+            throw new CustomException(createErrorResponse(
+                    "Erro de negócio",
+                    "Não é possível cancelar uma transferência agendada para hoje ou para uma data anterior."
+            ), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        transfer.setStatus(TransferStatus.CANCELLED);
+        Transfer updatedTransfer = transferRepository.save(transfer);
+        return toTransferResponse(updatedTransfer);
     }
 
     private BigDecimal calculateFee(BigDecimal amount, long daysDifference) {

@@ -11,4 +11,6 @@ public interface TransferService {
     List<TransferResponse> getAllTransfers();
 
     TransferResponse getTransferById(Long id);
+
+    TransferResponse cancelTransferById(Long id);
 }
