@@ -6,6 +6,8 @@ import com.test.luanbraz.navatransfer.services.TransferService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/transfers")
 public class TransferController {
@@ -24,5 +26,10 @@ public class TransferController {
     @PostMapping
     public ResponseEntity<TransferResponse> createTransfer(@RequestBody TransferRequest request) {
         return ResponseEntity.ok(transferService.createTransfer(request));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TransferResponse>> getAllTransfers() {
+        return ResponseEntity.ok(transferService.getAllTransfers());
     }
 }

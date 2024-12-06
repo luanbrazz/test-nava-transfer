@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TransferServiceImpl implements TransferService {
@@ -41,6 +43,13 @@ public class TransferServiceImpl implements TransferService {
         Transfer savedTransfer = transferRepository.save(transfer);
 
         return toTransferResponse(savedTransfer);
+    }
+
+    @Override
+    public List<TransferResponse> getAllTransfers() {
+        return transferRepository.findAll().stream()
+                .map(this::toTransferResponse)
+                .collect(Collectors.toList());
     }
 
     private BigDecimal calculateFee(BigDecimal amount, long daysDifference) {
