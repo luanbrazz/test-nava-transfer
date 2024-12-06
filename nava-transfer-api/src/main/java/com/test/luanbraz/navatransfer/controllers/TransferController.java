@@ -1,15 +1,28 @@
 package com.test.luanbraz.navatransfer.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.test.luanbraz.navatransfer.dto.TransferRequest;
+import com.test.luanbraz.navatransfer.dto.TransferResponse;
+import com.test.luanbraz.navatransfer.services.TransferService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/transfers")
 public class TransferController {
 
-    @GetMapping("/teste")
-    public String teste(){
-        return "testando api...";
+    private final TransferService transferService;
+
+    public TransferController(TransferService transferService) {
+        this.transferService = transferService;
+    }
+
+    @GetMapping("/test")
+    public String teste() {
+        return "testing api...";
+    }
+
+    @PostMapping
+    public ResponseEntity<TransferResponse> createTransfer(@RequestBody TransferRequest request) {
+        return ResponseEntity.ok(transferService.createTransfer(request));
     }
 }
