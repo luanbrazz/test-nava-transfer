@@ -4,16 +4,16 @@
   <div class="form-container">
     <form [formGroup]="transferForm" (ngSubmit)="createTransfer()">
       <div class="form-group">
-        <input type="text" class="form-control" formControlName="sourceAccount" placeholder="Conta Origem" />
+        <input type="text" class="form-control" formControlName="sourceAccount" placeholder="Conta Origem" maxlength="10" />
       </div>
       <div class="form-group">
-        <input type="text" class="form-control" formControlName="destinationAccount" placeholder="Conta Destino" />
+        <input type="text" class="form-control" formControlName="destinationAccount" placeholder="Conta Destino" maxlength="10" />
       </div>
       <div class="form-group">
         <input type="number" class="form-control" formControlName="amount" placeholder="Valor" />
       </div>
       <div class="form-group">
-        <input type="date" class="form-control" formControlName="transferDate" />
+        <input type="date" class="form-control" formControlName="transferDate" [min]="minDate" />
       </div>
       <button type="submit" class="btn btn-primary">Fazer Transferência</button>
     </form>

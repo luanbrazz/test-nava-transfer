@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { JwtService } from 'src/app/service/jwt.service';
 
 @Component({
@@ -10,7 +11,11 @@ import { JwtService } from 'src/app/service/jwt.service';
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
 
-  constructor(private service: JwtService, private fb: FormBuilder) {}
+  constructor(
+    private service: JwtService,
+    private fb: FormBuilder,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.registerForm = this.fb.group(
@@ -41,6 +46,7 @@ export class RegisterComponent implements OnInit {
         (response) => {
           if (response && response.id) {
             alert('Olá ' + response.name + ' você foi cadastrado com sucesso!');
+            this.router.navigate(['/login']);
           } else {
             alert('Erro inesperado: Resposta inválida do servidor.');
           }

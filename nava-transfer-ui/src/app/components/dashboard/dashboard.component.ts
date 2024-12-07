@@ -10,12 +10,20 @@ import { TransferService } from 'src/app/service/transfer.service';
 export class DashboardComponent implements OnInit {
   transferForm!: FormGroup;
   transfers: any[] = [];
+  minDate: string = '';
 
   constructor(private fb: FormBuilder, private transferService: TransferService) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadTransfers();
+    this.setMinDate();
+  }
+
+  setMinDate(): void {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    this.minDate = today.toISOString().split('T')[0];
   }
 
   initializeForm(): void {
