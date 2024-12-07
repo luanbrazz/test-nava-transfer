@@ -1,8 +1,7 @@
-<nav class="navbar navbar-expand navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand" href="#">NAVA Transfer</a>
-
-    <ul class="navbar-nav ml-auto">
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1">NAVA Transfer</span>
+    <ul class="navbar-nav ms-auto mb-2 mb-lg-0" *ngIf="!isDashboardRoute()">
       <li class="nav-item">
         <a class="nav-link" routerLink="/register">Registre-se</a>
       </li>
@@ -10,6 +9,7 @@
         <a class="nav-link" routerLink="/login">Entre</a>
       </li>
     </ul>
+    <button class="btn btn-danger" *ngIf="isDashboardRoute()" (click)="logout()">Sair</button>
   </div>
 </nav>
 

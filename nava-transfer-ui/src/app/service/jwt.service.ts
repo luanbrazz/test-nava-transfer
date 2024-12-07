@@ -18,14 +18,6 @@ export class JwtService {
     return this.http.post(BASE_URL + 'login', loginRequest);
   }
 
-  hello(): Observable<any> {
-    const headers = this.createAuthorizationHeader();
-    if (!headers) {
-      throw new Error('Authorization header is missing. Please login.');
-    }
-    return this.http.get(BASE_URL + 'api/hello', { headers });
-  }
-
   private createAuthorizationHeader(): HttpHeaders | null {
     const jwtToken = localStorage.getItem('jwt');
     if (jwtToken) {
@@ -36,4 +28,5 @@ export class JwtService {
       return null;
     }
   }
+
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PATCH})
 @RestController
 @RequestMapping("/api/transfers")
 public class TransferController {
@@ -16,11 +17,6 @@ public class TransferController {
 
     public TransferController(TransferService transferService) {
         this.transferService = transferService;
-    }
-
-    @GetMapping("/test")
-    public String teste() {
-        return "testing api...";
     }
 
     @PostMapping
