@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 @Entity
 public class Transfer {
 
@@ -34,6 +33,18 @@ public class Transfer {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TransferStatus status;
+
+    @Column(nullable = false)
+    private Long userId;
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
 
     public Long getId() {
         return id;

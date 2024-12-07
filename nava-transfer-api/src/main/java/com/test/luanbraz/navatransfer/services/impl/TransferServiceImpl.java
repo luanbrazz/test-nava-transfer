@@ -6,9 +6,11 @@ import com.test.luanbraz.navatransfer.dto.errors.CustomErrorResponse;
 import com.test.luanbraz.navatransfer.entities.Transfer;
 import com.test.luanbraz.navatransfer.entities.enuns.TransferStatus;
 import com.test.luanbraz.navatransfer.exceptions.CustomException;
+import com.test.luanbraz.navatransfer.repositories.CustomerRepository;
 import com.test.luanbraz.navatransfer.repositories.TransferRepository;
 import com.test.luanbraz.navatransfer.services.TransferService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,19 +18,27 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TransferServiceImpl implements TransferService {
 
     private final TransferRepository transferRepository;
+    private final CustomerRepository userRepository;
 
-    public TransferServiceImpl(TransferRepository transferRepository) {
+    public TransferServiceImpl(TransferRepository transferRepository, CustomerRepository userRepository) {
         this.transferRepository = transferRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public TransferResponse createTransfer(TransferRequest request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(
+                        createErrorResponse("Erro de autenticação", "Usuário não encontrado."),
+                        HttpStatus.UNAUTHORIZED
+                )).getId();
+
         LocalDate today = LocalDate.now();
         long daysDifference = ChronoUnit.DAYS.between(today, request.getTransferDate());
 
@@ -41,7 +51,7 @@ public class TransferServiceImpl implements TransferService {
             );
         }
 
-        Transfer transfer = buildTransfer(request, today, fee);
+        Transfer transfer = buildTransfer(request, today, fee, userId);
         transfer.setStatus(request.getTransferDate().isEqual(today) ? TransferStatus.COMPLETED : TransferStatus.PENDING);
 
         Transfer savedTransfer = transferRepository.save(transfer);
@@ -51,7 +61,14 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public List<TransferResponse> getAllTransfers() {
-        return transferRepository.findAll().stream()
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(
+                        createErrorResponse("Erro de autenticação", "Usuário não encontrado."),
+                        HttpStatus.UNAUTHORIZED
+                )).getId();
+
+        return transferRepository.findByUserId(userId).stream()
                 .map(this::toTransferResponse)
                 .toList();
     }
@@ -64,7 +81,20 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public TransferResponse cancelTransferById(Long id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(
+                        createErrorResponse("Erro de autenticação", "Usuário não encontrado."),
+                        HttpStatus.UNAUTHORIZED
+                )).getId();
+
         Transfer transfer = findTransferByIdOrThrow(id, "Erro de cancelamento de transferência", "Transferência não encontrada.");
+
+        if (!transfer.getUserId().equals(userId)) {
+            throw new CustomException(createErrorResponse(
+                    "Erro de autorização", "Você não tem permissão para cancelar esta transferência."
+            ), HttpStatus.FORBIDDEN);
+        }
 
         if (!transfer.getTransferDate().isAfter(LocalDate.now())) {
             throw new CustomException(createErrorResponse(
@@ -96,7 +126,7 @@ public class TransferServiceImpl implements TransferService {
         );
     }
 
-    private Transfer buildTransfer(TransferRequest request, LocalDate today, BigDecimal fee) {
+    private Transfer buildTransfer(TransferRequest request, LocalDate today, BigDecimal fee, Long userId) {
         Transfer transfer = new Transfer();
         transfer.setSourceAccount(request.getSourceAccount());
         transfer.setDestinationAccount(request.getDestinationAccount());
@@ -104,6 +134,7 @@ public class TransferServiceImpl implements TransferService {
         transfer.setFee(fee);
         transfer.setTransferDate(request.getTransferDate());
         transfer.setScheduleDate(today);
+        transfer.setUserId(userId);
         return transfer;
     }
 
