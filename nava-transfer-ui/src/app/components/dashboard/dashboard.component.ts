@@ -56,13 +56,17 @@ export class DashboardComponent implements OnInit {
         },
         (error) => {
           console.error('Erro ao criar transferência:', error);
-          alert('Erro ao criar transferência.');
+
+          const errorMessage = error.error?.message || 'Erro ao criar transferência.';
+          const errorStatus = error.status || 'Desconhecido';
+          alert(`Erro ${errorStatus}: ${errorMessage}`);
         }
       );
     } else {
       alert('Por favor, preencha todos os campos do formulário.');
     }
   }
+
 
   deleteTransfer(id: number, status: string): void {
     if (status === 'CANCELLED' || status === 'COMPLETED') {
